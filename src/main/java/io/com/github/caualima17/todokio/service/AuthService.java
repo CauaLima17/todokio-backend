@@ -3,9 +3,9 @@ package io.com.github.caualima17.todokio.service;
 import io.com.github.caualima17.todokio.config.jwt.JwtTokenProvider;
 import io.com.github.caualima17.todokio.model.User;
 import io.com.github.caualima17.todokio.repository.UserRepository;
-import io.com.github.caualima17.todokio.transfer.AuthenticationDTO;
-import io.com.github.caualima17.todokio.transfer.AuthenticationTokenDTO;
-import io.com.github.caualima17.todokio.transfer.RegisterUserDTO;
+import io.com.github.caualima17.todokio.transfer.AuthenticateUserRequestDTO;
+import io.com.github.caualima17.todokio.transfer.AuthenticateUserResponseDTO;
+import io.com.github.caualima17.todokio.transfer.RegisterUserRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,14 +29,14 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public AuthenticationTokenDTO login(AuthenticationDTO data) {
+    public AuthenticateUserResponseDTO login(AuthenticateUserRequestDTO data) {
         UsernamePasswordAuthenticationToken userAuthToken = new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword());
         var auth = authenticationManager.authenticate(userAuthToken);
 
         User user = Objects.requireNonNull((User) auth.getPrincipal());
         String token = jwtTokenProvider.generateToken(user);
 
-        return AuthenticationTokenDTO.builder()
+        return AuthenticateUserResponseDTO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
@@ -44,7 +44,7 @@ public class AuthService {
                 .build();
     }
 
-    public void register(RegisterUserDTO data) {
+    public void register(RegisterUserRequestDTO data) {
         try {
             userRepository.findByEmail(data.getEmail()).ifPresent((u) -> {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um usuário registrado com esse email.");

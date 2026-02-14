@@ -1,8 +1,9 @@
 package io.com.github.caualima17.todokio.controller;
 
 import io.com.github.caualima17.todokio.service.AuthService;
-import io.com.github.caualima17.todokio.transfer.AuthenticationDTO;
-import io.com.github.caualima17.todokio.transfer.RegisterUserDTO;
+import io.com.github.caualima17.todokio.transfer.AuthenticateUserRequestDTO;
+import io.com.github.caualima17.todokio.transfer.AuthenticateUserResponseDTO;
+import io.com.github.caualima17.todokio.transfer.RegisterUserRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +24,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
+    public ResponseEntity<AuthenticateUserResponseDTO> login(@RequestBody @Valid AuthenticateUserRequestDTO data) {
         return ResponseEntity.ok(authService.login(data));
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterUserDTO data) {
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterUserRequestDTO data) {
         authService.register(data);
         return ResponseEntity.ok().build();
     }

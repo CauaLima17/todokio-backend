@@ -30,7 +30,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = this.recoverToken(response);
+        String token = this.recoverToken(request);
 
         if (token != null) {
             String login = jwtTokenProvider.validateToken(token);
@@ -43,8 +43,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String recoverToken(HttpServletResponse response) {
-        String authenticationHeader = response.getHeader("Authorization");
+    private String recoverToken(HttpServletRequest request) {
+        String authenticationHeader = request.getHeader("Authorization");
         if (authenticationHeader == null) return  null;
        return authenticationHeader.replace("Bearer ", "");
     }
