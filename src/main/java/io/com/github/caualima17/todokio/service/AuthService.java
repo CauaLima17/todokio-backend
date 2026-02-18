@@ -30,18 +30,22 @@ public class AuthService {
     }
 
     public AuthenticateUserResponseDTO login(AuthenticateUserRequestDTO data) {
-        UsernamePasswordAuthenticationToken userAuthToken = new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword());
-        var auth = authenticationManager.authenticate(userAuthToken);
+        try {
+            UsernamePasswordAuthenticationToken userAuthToken = new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword());
+            var auth = authenticationManager.authenticate(userAuthToken);
 
-        User user = Objects.requireNonNull((User) auth.getPrincipal());
-        String token = jwtTokenProvider.generateToken(user);
+            User user = Objects.requireNonNull((User) auth.getPrincipal());
+            String token = jwtTokenProvider.generateToken(user);
 
-        return AuthenticateUserResponseDTO.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .token(token)
-                .build();
+            return AuthenticateUserResponseDTO.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .token(token)
+                    .build();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Não foi possível realizar login. Verifique suas credenciais e tente novamente.");
+        }
     }
 
     public void register(RegisterUserRequestDTO data) {

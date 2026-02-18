@@ -2,6 +2,7 @@ package io.com.github.caualima17.todokio.controller;
 
 import io.com.github.caualima17.todokio.service.UserService;
 import io.com.github.caualima17.todokio.transfer.UserDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class UserController {
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody UserDTO data) {
+    public ResponseEntity<Void> update(@PathVariable("id") Long id, @Valid @RequestBody UserDTO data) {
         userService.update(id, data);
         return ResponseEntity.ok().build();
     }

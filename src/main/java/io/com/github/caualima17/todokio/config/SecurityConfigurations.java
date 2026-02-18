@@ -20,10 +20,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfigurations {
 
     private JwtTokenFilter jwtTokenFilter;
+    private Http401AuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    public SecurityConfigurations(JwtTokenFilter jwtTokenFilter) {
+    public SecurityConfigurations(JwtTokenFilter jwtTokenFilter, Http401AuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtTokenFilter = jwtTokenFilter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Bean
@@ -35,6 +37,7 @@ public class SecurityConfigurations {
                     authorization.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
                     authorization.anyRequest().authenticated();
                 })
+                .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

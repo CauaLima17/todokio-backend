@@ -35,7 +35,7 @@ public class UserService {
 
     public UserDTO getById(Long id) {
         try {
-            User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+            User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar esse usuário."));
             return UserDTO.fromEntityToDTO(user);
         } catch (ResponseStatusException e) {
             throw e;
@@ -47,7 +47,7 @@ public class UserService {
     public void update(Long id, UserDTO data) {
         try {
             BCryptPasswordEncoder crypt = new BCryptPasswordEncoder();
-            User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+            User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar esse usuário."));
 
             data.setPassword(crypt.encode(data.getPassword()));
             BeanUtils.copyProperties(data, user, "id");
@@ -63,7 +63,7 @@ public class UserService {
 
     public void delete(Long id) {
         try {
-            User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+            User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar esse usuário."));
             user.onDelete();
 
             userRepository.save(user);
