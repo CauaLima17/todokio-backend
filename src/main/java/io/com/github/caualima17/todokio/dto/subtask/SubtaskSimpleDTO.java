@@ -1,10 +1,10 @@
 package io.com.github.caualima17.todokio.dto.subtask;
 
 import io.com.github.caualima17.todokio.dto.BaseModelDTO;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Data
 public class SubtaskSimpleDTO extends BaseModelDTO {
     private String name;

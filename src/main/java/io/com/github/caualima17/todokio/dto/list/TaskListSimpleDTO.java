@@ -1,10 +1,10 @@
 package io.com.github.caualima17.todokio.dto.list;
 
 import io.com.github.caualima17.todokio.dto.BaseModelDTO;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Data
 public class TaskListSimpleDTO extends BaseModelDTO {
     private String name;

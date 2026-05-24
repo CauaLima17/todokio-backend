@@ -6,11 +6,12 @@ import io.com.github.caualima17.todokio.dto.subtask.SubtaskSimpleDTO;
 import io.com.github.caualima17.todokio.dto.tag.TagSimpleDTO;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
+@SuperBuilder
 @Data
 public class TaskResponseDTO extends BaseModelDTO {
     private String name;

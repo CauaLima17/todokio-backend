@@ -1,14 +1,18 @@
 package io.com.github.caualima17.todokio.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-@Builder
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class BaseModelDTO {
     private Long id;
-    private Date createdOn;
-    private Date updatedOn;
+    private LocalDateTime createdOn;
+    private LocalDateTime updatedOn;
 }
