@@ -1,9 +1,9 @@
 package io.com.github.caualima17.todokio.controller;
 
 import io.com.github.caualima17.todokio.service.AuthService;
-import io.com.github.caualima17.todokio.transfer.AuthenticateUserRequestDTO;
-import io.com.github.caualima17.todokio.transfer.AuthenticateUserResponseDTO;
-import io.com.github.caualima17.todokio.transfer.RegisterUserRequestDTO;
+import io.com.github.caualima17.todokio.dto.user.AuthenticateUserRequestDTO;
+import io.com.github.caualima17.todokio.dto.user.AuthenticateUserResponseDTO;
+import io.com.github.caualima17.todokio.dto.user.RegisterUserRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

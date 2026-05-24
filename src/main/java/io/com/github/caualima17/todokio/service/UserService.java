@@ -2,7 +2,7 @@ package io.com.github.caualima17.todokio.service;
 
 import io.com.github.caualima17.todokio.model.User;
 import io.com.github.caualima17.todokio.repository.UserRepository;
-import io.com.github.caualima17.todokio.transfer.UserDTO;
+import io.com.github.caualima17.todokio.dto.user.UserDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

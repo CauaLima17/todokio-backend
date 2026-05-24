@@ -1,4 +1,4 @@
-package io.com.github.caualima17.todokio.transfer;
+package io.com.github.caualima17.todokio.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.com.github.caualima17.todokio.model.User;

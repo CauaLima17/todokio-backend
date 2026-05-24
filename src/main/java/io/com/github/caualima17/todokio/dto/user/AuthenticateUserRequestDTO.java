@@ -1,4 +1,4 @@
-package io.com.github.caualima17.todokio.transfer;
+package io.com.github.caualima17.todokio.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,12 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class AuthenticateUserResponseDTO {
-    private Long id;
-    @NotNull @NotBlank
-    private String name;
+public class AuthenticateUserRequestDTO {
     @NotNull @NotBlank
     private String email;
     @NotNull @NotBlank
-    private String token;
+    private String password;
 }

@@ -1,8 +1,8 @@
 package io.com.github.caualima17.todokio.controller;
 
 import io.com.github.caualima17.todokio.service.TaskService;
-import io.com.github.caualima17.todokio.transfer.TaskRequestDTO;
-import io.com.github.caualima17.todokio.transfer.TaskResponseDTO;
+import io.com.github.caualima17.todokio.dto.task.TaskRequestDTO;
+import io.com.github.caualima17.todokio.dto.task.TaskResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

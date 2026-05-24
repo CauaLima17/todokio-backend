@@ -1,7 +1,7 @@
 package io.com.github.caualima17.todokio.controller;
 
 import io.com.github.caualima17.todokio.service.UserService;
-import io.com.github.caualima17.todokio.transfer.UserDTO;
+import io.com.github.caualima17.todokio.dto.user.UserDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
