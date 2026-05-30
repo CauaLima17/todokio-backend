@@ -45,13 +45,13 @@ public class TaskMapper {
                 .dueTime(data.getDueTime())
                 .list(TaskListMapper.toSimpleDTO(data.getList()))
                 .tags(TagMapper.toSimpleDTO(data.getTags()))
-                .subtasks(SubtaskMapper.fromEntityToSimpleDto(data.getSubtasks()))
+                .subtasks(SubtaskMapper.toSimpleDTO(data.getSubtasks()))
                 .createdOn(data.getCreationDate())
                 .updatedOn(data.getUpdateDate())
                 .build();
     }
 
-    public TaskSimpleDTO toSimpleDTO(Task data) {
+    public static TaskSimpleDTO toSimpleDTO(Task data) {
         if (data == null) return null;
 
         return TaskSimpleDTO.builder()
@@ -64,7 +64,7 @@ public class TaskMapper {
                 .build();
     }
 
-    public List<TaskSimpleDTO> toSimpleDTO(List<Task> tasks) {
+    public static List<TaskSimpleDTO> toSimpleDTO(List<Task> tasks) {
         List<TaskSimpleDTO> simpleDTOs = new ArrayList<>();
 
         for (Task data : tasks) {

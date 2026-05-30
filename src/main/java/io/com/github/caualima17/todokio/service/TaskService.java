@@ -59,6 +59,7 @@ public class TaskService {
             });
 
             Task task = buildTask(data);
+            task.onCreate();
             taskRepository.save(task);
         } catch (ResponseStatusException e) {
             throw e;
@@ -72,7 +73,7 @@ public class TaskService {
             Task target = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar essa tarefa."));
             Task source = buildTask(data);
 
-            BeanUtils.copyProperties(source, target, "id");
+            BeanUtils.copyProperties(source, target, "id", "creationDate");
 
             target.onUpdate();
             taskRepository.save(target);

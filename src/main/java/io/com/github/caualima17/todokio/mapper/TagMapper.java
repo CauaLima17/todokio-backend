@@ -5,8 +5,6 @@ import io.com.github.caualima17.todokio.dto.tag.TagResponseDTO;
 import io.com.github.caualima17.todokio.dto.tag.TagSimpleDTO;
 import io.com.github.caualima17.todokio.model.Tag;
 import io.com.github.caualima17.todokio.model.Task;
-import io.com.github.caualima17.todokio.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,18 +13,16 @@ import java.util.List;
 @Component
 public class TagMapper {
 
-    private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
-
-    @Autowired
-    public TagMapper(TaskRepository taskRepository, TaskMapper taskMapper) {
-        this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
+    public TagMapper() {
     }
 
     public Tag toEntity(TagRequestDTO data) {
-        List<Task> tasks = taskRepository.findAllById(data.getTasksID());
+        return Tag.builder()
+                .name(data.getName())
+                .build();
+    }
 
+    public Tag toEntity(TagRequestDTO data, List<Task> tasks) {
         return Tag.builder()
                 .name(data.getName())
                 .tasks(tasks)
@@ -37,13 +33,13 @@ public class TagMapper {
         return TagResponseDTO.builder()
                 .id(data.getId())
                 .name(data.getName())
-                .tasks(taskMapper.toSimpleDTO(data.getTasks()))
+                .tasks(TaskMapper.toSimpleDTO(data.getTasks()))
                 .createdOn(data.getCreationDate())
                 .updatedOn(data.getUpdateDate())
                 .build();
     }
 
-    public TagSimpleDTO toSimpleDTO(Tag data) {
+    public static TagSimpleDTO toSimpleDTO(Tag data) {
         if (data == null) return null;
 
         return TagSimpleDTO.builder()
