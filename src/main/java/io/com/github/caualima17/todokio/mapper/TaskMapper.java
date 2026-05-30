@@ -1,7 +1,5 @@
 package io.com.github.caualima17.todokio.mapper;
 
-import io.com.github.caualima17.todokio.dto.subtask.SubtaskResponseDTO;
-import io.com.github.caualima17.todokio.dto.subtask.SubtaskSimpleDTO;
 import io.com.github.caualima17.todokio.dto.task.TaskRequestDTO;
 import io.com.github.caualima17.todokio.dto.task.TaskResponseDTO;
 import io.com.github.caualima17.todokio.dto.task.TaskSimpleDTO;
@@ -9,13 +7,7 @@ import io.com.github.caualima17.todokio.model.Subtask;
 import io.com.github.caualima17.todokio.model.Tag;
 import io.com.github.caualima17.todokio.model.Task;
 import io.com.github.caualima17.todokio.model.TaskList;
-import io.com.github.caualima17.todokio.repository.SubtaskRepository;
-import io.com.github.caualima17.todokio.repository.TagRepository;
-import io.com.github.caualima17.todokio.repository.TaskListRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,38 +15,18 @@ import java.util.List;
 @Component
 public class TaskMapper {
 
-    private final TaskListRepository taskListRepository;
-    private final TagRepository tagRepository;
-    private final SubtaskRepository subtaskRepository;
-    private final TagMapper tagMapper;
-    private final TaskListMapper taskListMapper;
-    private final SubtaskMapper subtaskMapper;
-
-    @Autowired
-    public TaskMapper(TaskListRepository taskListRepository, TagRepository tagRepository, SubtaskRepository subtaskRepository, TagMapper tagMapper, TaskListMapper taskListMapper, SubtaskMapper subtaskMapper) {
-        this.taskListRepository = taskListRepository;
-        this.tagRepository = tagRepository;
-        this.subtaskRepository = subtaskRepository;
-        this.tagMapper = tagMapper;
-        this.taskListMapper = taskListMapper;
-        this.subtaskMapper = subtaskMapper;
+    public TaskMapper() {
     }
 
-    public Task fromDtoToEntity(TaskRequestDTO data) {
+    public Task toEntity(TaskRequestDTO data) {
+        return Task.builder()
+                .name(data.getName())
+                .description(data.getDescription())
+                .dueTime(data.getDueTime())
+                .build();
+    }
 
-        TaskList taskList = data.getListID() != null
-                ? taskListRepository.findById(data.getListID())
-                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "A coleção de tarefas a qual essa tarefa está associada não existe."))
-                : null;
-
-        List<Tag> tags = data.getTagsID().isEmpty()
-                ? null
-                : tagRepository.findAllById(data.getTagsID());
-
-        List<Subtask> subtasks = data.getSubtasksID().isEmpty()
-                ? null
-                : subtaskRepository.findAllById(data.getSubtasksID());
-
+    public Task toEntity(TaskRequestDTO data, TaskList taskList, List<Tag> tags, List<Subtask> subtasks) {
         return Task.builder()
                 .name(data.getName())
                 .description(data.getDescription())
@@ -65,21 +37,23 @@ public class TaskMapper {
                 .build();
     }
 
-    public TaskResponseDTO fromEntityToDto(Task data) {
+    public TaskResponseDTO toResponse(Task data) {
         return TaskResponseDTO.builder()
                 .id(data.getId())
                 .name(data.getName())
                 .description(data.getDescription())
                 .dueTime(data.getDueTime())
-                .list(taskListMapper.fromEntityToSimpleDto(data.getList()))
-                .tags(tagMapper.fromEntityToSimpleDto(data.getTags()))
-                .subtasks(subtaskMapper.fromEntityToSimpleDto(data.getSubtasks()))
+                .list(TaskListMapper.toSimpleDTO(data.getList()))
+                .tags(TagMapper.toSimpleDTO(data.getTags()))
+                .subtasks(SubtaskMapper.fromEntityToSimpleDto(data.getSubtasks()))
                 .createdOn(data.getCreationDate())
                 .updatedOn(data.getUpdateDate())
                 .build();
     }
 
-    public TaskSimpleDTO fromEntityToSimpleDto(Task data) {
+    public TaskSimpleDTO toSimpleDTO(Task data) {
+        if (data == null) return null;
+
         return TaskSimpleDTO.builder()
                 .id(data.getId())
                 .name(data.getName())
@@ -90,7 +64,7 @@ public class TaskMapper {
                 .build();
     }
 
-    public List<TaskSimpleDTO> fromEntityToSimpleDto(List<Task> tasks) {
+    public List<TaskSimpleDTO> toSimpleDTO(List<Task> tasks) {
         List<TaskSimpleDTO> simpleDTOs = new ArrayList<>();
 
         for (Task data : tasks) {

@@ -11,5 +11,6 @@ import lombok.Data;
 public class SubtaskRequestDTO {
     @NotNull @NotBlank
     private String name;
+    @NotNull @NotBlank
     private Long taskID;
 }

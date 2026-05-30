@@ -1,47 +1,54 @@
 package io.com.github.caualima17.todokio.service;
 
+import io.com.github.caualima17.todokio.mapper.TaskMapper;
+import io.com.github.caualima17.todokio.model.Subtask;
 import io.com.github.caualima17.todokio.model.Tag;
 import io.com.github.caualima17.todokio.model.Task;
 import io.com.github.caualima17.todokio.model.TaskList;
+import io.com.github.caualima17.todokio.repository.SubtaskRepository;
 import io.com.github.caualima17.todokio.repository.TagRepository;
 import io.com.github.caualima17.todokio.repository.TaskListRepository;
 import io.com.github.caualima17.todokio.repository.TaskRepository;
-import io.com.github.caualima17.todokio.dto.tag.TagRequestDTO;
 import io.com.github.caualima17.todokio.dto.task.TaskRequestDTO;
 import io.com.github.caualima17.todokio.dto.task.TaskResponseDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
-    private TaskRepository taskRepository;
-    private TaskListRepository taskListRepository;
-    private TagRepository tagRepository;
-
-    @Autowired
-    public TaskService(TaskRepository taskRepository, TagRepository tagRepository, TaskListRepository taskListRepository) {
-        this.taskRepository = taskRepository;
-        this.tagRepository = tagRepository;
-        this.taskListRepository = taskListRepository;
-    }
+    private final TaskMapper taskMapper;
+    private final TaskRepository taskRepository;
+    private final TaskListRepository taskListRepository;
+    private final TagRepository tagRepository;
+    private final SubtaskRepository subtaskRepository;
 
     public List<TaskResponseDTO> getAll() {
         try {
             return taskRepository.findAll()
                     .stream()
-                    .map((TaskResponseDTO::fromEntityToDTO))
+                    .map((taskMapper::toResponse))
                     .toList();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ocorreu um erro desconhecido ao listar tarefas: " + e);
+        }
+    }
+
+    public TaskResponseDTO getById(Long id) {
+        try {
+            Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar essa tarefa."));
+            return taskMapper.toResponse(task);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ocorreu um erro desconhecido ao buscar tarefa: " + e);
         }
     }
 
@@ -51,12 +58,7 @@ public class TaskService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe uma tarefa registrada com esse nome. Tente novamente com um novo nome ou atualize a tarefa existente.");
             });
 
-            validateTaskList(data.getList());
-            List<Tag> tags = validateTaskTags(data.getTags());
-
-            Task task = TaskRequestDTO.fromDtoToEntity(data);
-            task.setTags(tags);
-
+            Task task = buildTask(data);
             taskRepository.save(task);
         } catch (ResponseStatusException e) {
             throw e;
@@ -65,29 +67,15 @@ public class TaskService {
         }
     }
 
-    public TaskResponseDTO getById(Long id) {
-        try {
-            Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar essa tarefa."));
-            return TaskResponseDTO.fromEntityToDTO(task);
-        } catch (ResponseStatusException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ocorreu um erro desconhecido ao buscar tarefa: " + e);
-        }
-    }
-
     public void update(Long id, TaskRequestDTO data) {
         try {
-            Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar essa tarefa."));
+            Task target = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Não foi possível encontrar essa tarefa."));
+            Task source = buildTask(data);
 
-            validateTaskList(data.getList());
-            List<Tag> tags = validateTaskTags(data.getTags());
+            BeanUtils.copyProperties(source, target, "id");
 
-            BeanUtils.copyProperties(data, task, "id");
-            task.setTags(tags);
-
-            task.onUpdate();
-            taskRepository.save(task);
+            target.onUpdate();
+            taskRepository.save(target);
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
@@ -106,28 +94,20 @@ public class TaskService {
         }
     }
 
-    public void validateTaskList(TaskList taskList) {
-        if (Objects.nonNull(taskList)) {
-            taskListRepository.findById(taskList.getId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.BAD_REQUEST, "A lista de tarefas a qual essa tarefa está associada não existe ou foi deletada.")
-            );
-        }
-    }
+    private Task buildTask(TaskRequestDTO data) {
+        TaskList taskList = data.getListID() != null
+                ? taskListRepository.findById(data.getListID())
+                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "A coleção de tarefas a qual essa tarefa está associada não existe."))
+                : null;
 
-    public List<Tag> validateTaskTags(List<TagRequestDTO> tags) {
-        List<Tag> validatedTags = new ArrayList<>();
+        List<Tag> tags = data.getTagsID().isEmpty()
+                ? Collections.emptyList()
+                : tagRepository.findAllById(data.getTagsID());
 
-        for (TagRequestDTO tagRequest : tags) {
-            Optional<Tag> tagPersisted = tagRepository.findByName(tagRequest.getName());
+        List<Subtask> subtasks = data.getSubtasksID().isEmpty()
+                ? Collections.emptyList()
+                : subtaskRepository.findAllById(data.getSubtasksID());
 
-            if (tagPersisted.isEmpty()) {
-                Tag tagConstructed = TagRequestDTO.fromDtoToEntity(tagRequest);
-                validatedTags.add(tagRepository.save(tagConstructed));
-            } else {
-                validatedTags.add(tagPersisted.get());
-            }
-        }
-
-        return validatedTags;
+        return taskMapper.toEntity(data, taskList, tags, subtasks);
     }
 }
