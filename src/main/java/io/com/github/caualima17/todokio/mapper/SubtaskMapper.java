@@ -5,11 +5,7 @@ import io.com.github.caualima17.todokio.dto.subtask.SubtaskResponseDTO;
 import io.com.github.caualima17.todokio.dto.subtask.SubtaskSimpleDTO;
 import io.com.github.caualima17.todokio.model.Subtask;
 import io.com.github.caualima17.todokio.model.Task;
-import io.com.github.caualima17.todokio.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,22 +13,19 @@ import java.util.List;
 @Component
 public class SubtaskMapper {
 
-    private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
-
-    @Autowired
-    public SubtaskMapper(TaskRepository taskRepository, TaskMapper taskMapper) {
-        this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
+    public SubtaskMapper() {
     }
 
-    public Subtask toEntity(SubtaskRequestDTO data) {
-        Task task = taskRepository.findById(data.getTaskID())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "A tarefa a qual essa subtarefa está associada não existe."));
-
+    public Subtask toEntity(SubtaskRequestDTO data, Task task) {
         return Subtask.builder()
                 .name(data.getName())
                 .task(task)
+                .build();
+    }
+
+    public Subtask toEntity(SubtaskRequestDTO data) {
+        return Subtask.builder()
+                .name(data.getName())
                 .build();
     }
 
@@ -40,7 +33,7 @@ public class SubtaskMapper {
         return SubtaskResponseDTO.builder()
                 .id(data.getId())
                 .name(data.getName())
-                .task(taskMapper.toSimpleDTO(data.getTask()))
+                .task(TaskMapper.toSimpleDTO(data.getTask()))
                 .createdOn(data.getCreationDate())
                 .updatedOn(data.getUpdateDate())
                 .build();
